@@ -1,0 +1,236 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #6897bb;}
+.s4 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">#Importing the functions</span>
+<span class="s2">import </span><span class="s1">pygame </span><span class="s0">#Imports the Pygame Module</span>
+<span class="s2">import </span><span class="s1">random </span><span class="s0">#Imports the Random Module</span>
+
+<span class="s0">#Pre Defined settings</span>
+<span class="s1">width = </span><span class="s3">480 </span><span class="s0">#Sets the width of the window</span>
+<span class="s1">height = </span><span class="s3">600 </span><span class="s0">#Sets the height of the window</span>
+<span class="s1">fps = </span><span class="s3">20 </span><span class="s0">#Sets the Max FPS/ Target FPS</span>
+
+<span class="s0"># Defines the Colours needed</span>
+<span class="s1">BLACK = (</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)</span>
+<span class="s1">WHITE = (</span><span class="s3">255</span><span class="s2">, </span><span class="s3">255</span><span class="s2">, </span><span class="s3">255</span><span class="s1">)</span>
+<span class="s1">RED = (</span><span class="s3">255</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)</span>
+<span class="s1">GREEN = (</span><span class="s3">0</span><span class="s2">, </span><span class="s3">255</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)</span>
+<span class="s1">BLUE = (</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">255</span><span class="s1">)</span>
+<span class="s1">YELLOW = (</span><span class="s3">255</span><span class="s2">, </span><span class="s3">255</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)</span>
+
+<span class="s0"># Main Pygame Startup</span>
+<span class="s1">pygame.init() </span><span class="s0">#Initalizes all imported pygame modules</span>
+<span class="s1">pygame.mixer.init() </span><span class="s0">#Initializes the mixer module</span>
+<span class="s1">screen = pygame.display.set_mode((width</span><span class="s2">, </span><span class="s1">height)) </span><span class="s0">#Initialize a windo or screen for displau</span>
+<span class="s1">pygame.display.set_caption(</span><span class="s4">&quot;SHMUP&quot;</span><span class="s1">) </span><span class="s0">#Set the current window caption</span>
+<span class="s1">clock = pygame.time.Clock() </span><span class="s0">#Updates the clock</span>
+
+<span class="s1">font_name = pygame.font.match_font(</span><span class="s4">'arial'</span><span class="s1">) </span><span class="s0">#Find a specific font on the system</span>
+<span class="s2">def </span><span class="s1">draw_text(surf</span><span class="s2">, </span><span class="s1">text</span><span class="s2">, </span><span class="s1">size</span><span class="s2">, </span><span class="s1">x</span><span class="s2">, </span><span class="s1">y):</span>
+    <span class="s1">font = pygame.font.Font(font_name</span><span class="s2">, </span><span class="s1">size) </span><span class="s0">#Create a new Font object from a file</span>
+    <span class="s1">text_surface = font.render(text</span><span class="s2">, True, </span><span class="s1">WHITE) </span><span class="s0">#Draw text on a new Surface</span>
+    <span class="s1">text_rect = text_surface.get_rect()</span>
+    <span class="s1">text_rect.midtop = (x</span><span class="s2">, </span><span class="s1">y)</span>
+    <span class="s1">surf.blit(text_surface</span><span class="s2">, </span><span class="s1">text_rect)</span>
+
+<span class="s0">#Player Class of moving sprite</span>
+<span class="s2">class </span><span class="s1">Player(pygame.sprite.Sprite):</span>
+    <span class="s2">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">pygame.sprite.Sprite.__init__(self) </span><span class="s0">#Simple base class for visible game objects</span>
+        <span class="s1">self.image = player_img </span><span class="s0">#Assigns the object an image in order to give it graphics</span>
+        <span class="s1">self.image = pygame.transform.scale(player_img</span><span class="s2">, </span><span class="s1">(</span><span class="s3">50</span><span class="s2">, </span><span class="s3">38</span><span class="s1">)) </span><span class="s0">#Resize to new resolution</span>
+        <span class="s1">self.image.set_colorkey(BLACK) </span><span class="s0">#Sets the colour to make transparent (Taking out the background)</span>
+        <span class="s0">#Defines the hit box of the player sprite</span>
+        <span class="s1">self.rect = self.image.get_rect() </span><span class="s0">#Defines the rectangular hit box of a sprite</span>
+        <span class="s1">self.radius = int(self.rect.width * </span><span class="s3">.85 </span><span class="s1">/ </span><span class="s3">2</span><span class="s1">) </span><span class="s0">#Defines the circle hit box for the sprite</span>
+        <span class="s0">#Centers the PLayer Sprite to the bottom of the Screen into the starting position</span>
+        <span class="s1">self.rect.centerx = width / </span><span class="s3">2 </span><span class="s0">#Centers the sprite to the middle of the screen</span>
+        <span class="s1">self.rect.bottom = height - </span><span class="s3">10 </span><span class="s0">#Puts the sprite at the bottom of the window</span>
+        <span class="s1">self.speedx = </span><span class="s3">0 </span><span class="s0">#Sets the starting X axis speed to zero</span>
+        <span class="s1">self.shield = </span><span class="s3">100 </span><span class="s0">#Sets the Inital Shield Health</span>
+
+        <span class="s0"># Game Logic Player Movement</span>
+    <span class="s2">def </span><span class="s1">update(self):</span>
+        <span class="s1">self.speedx = </span><span class="s3">0 </span><span class="s0">#Sets the xaxis speed to zero</span>
+        <span class="s0"># Detects when a key is pressed</span>
+        <span class="s1">keystate = pygame.key.get_pressed() </span><span class="s0">#Triggers when any key is pressed</span>
+        <span class="s2">if </span><span class="s1">keystate[pygame.K_LEFT]: </span><span class="s0">#Triggers when the left key is pressed</span>
+            <span class="s1">self.speedx = -</span><span class="s3">8 </span><span class="s0">#Moves player sprite to the left</span>
+        <span class="s2">if </span><span class="s1">keystate[pygame.K_RIGHT]: </span><span class="s0">#Triggers when the right key is pressed</span>
+            <span class="s1">self.speedx = </span><span class="s3">8 </span><span class="s0">#Moves player sprite to the right</span>
+        <span class="s1">self.rect.x += self.speedx </span><span class="s0">#Moves the hitbox with the sprite</span>
+        <span class="s0">#Stops allowing the player to move if the sprite is off the screen</span>
+        <span class="s2">if </span><span class="s1">self.rect.right &gt; width: </span><span class="s0">#If the players x cord is more then the width of the screen in right direct</span>
+            <span class="s1">self.rect.right = width </span><span class="s0">#Stops the player sprite from moving</span>
+        <span class="s2">if </span><span class="s1">self.rect.left &lt; </span><span class="s3">0</span><span class="s1">: </span><span class="s0">#Checks to see if the player sprite is outside the screen area in the left</span>
+            <span class="s1">self.rect.left = </span><span class="s3">0 </span><span class="s0">#Stops the player sprite from moving</span>
+
+    <span class="s0">#Spawns a bullet at the position of the player</span>
+    <span class="s2">def </span><span class="s1">shoot(self):</span>
+        <span class="s1">bullet = Bullet(self.rect.centerx</span><span class="s2">, </span><span class="s1">self.rect.top) </span><span class="s0">#Centers the bullet sprite on the player sprite</span>
+        <span class="s1">all_sprites.add(bullet) </span><span class="s0">#Adds the bullet sprite to the sprite list</span>
+        <span class="s1">bullets.add(bullet) </span><span class="s0">#Adds multiple bullets</span>
+        <span class="s1">shootsound.play() </span><span class="s0">#Plays the premade shoot sound</span>
+
+<span class="s4">&quot;&quot;&quot;Enemy Class For Sprite 
+Rect is a pygame object for storing rectangular coordinates&quot;&quot;&quot;</span>
+<span class="s2">class </span><span class="s1">Mob(pygame.sprite.Sprite):</span>
+    <span class="s2">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">pygame.sprite.Sprite.__init__(self) </span><span class="s0">#Simple base class for visible game objects</span>
+        <span class="s1">self.image_orig = meteor_img </span><span class="s0">#Sets the sprite image to the imported metor img</span>
+        <span class="s1">self.image_orig.set_colorkey(BLACK) </span><span class="s0">#Sets the background colour of the object</span>
+        <span class="s1">self.image = self.image_orig.copy()</span>
+        <span class="s1">self.rect = self.image.get_rect() </span><span class="s0">#Sets a hit box rectangle to be munipulated into the shape of the mob</span>
+        <span class="s1">self.radius = int(self.rect.width / </span><span class="s3">2</span><span class="s1">) </span><span class="s0">#Sets the hitbox to a circle around the mob</span>
+        <span class="s0">#pygame.draw.circle(self.image, RED, self.rect.center, self.radius) --Used to see the hit box if i need to fix</span>
+        <span class="s0">#Movements of mob is randomised within the next part of the code</span>
+        <span class="s1">self.rect.x = random.randrange(width - self.rect.width) </span><span class="s0">#Randomises Movements within the x axis</span>
+        <span class="s1">self.rect.y = random.randrange(-</span><span class="s3">100</span><span class="s2">, </span><span class="s1">-</span><span class="s3">40</span><span class="s1">) </span><span class="s0">#Randomises movements within the y axis</span>
+        <span class="s1">self.speedy = random.randrange(</span><span class="s3">1</span><span class="s2">, </span><span class="s3">8</span><span class="s1">) </span><span class="s0">#Randomises Speed in the Y Axis</span>
+        <span class="s1">self.speedx = random.randrange(-</span><span class="s3">3</span><span class="s2">, </span><span class="s3">3</span><span class="s1">) </span><span class="s0">#Randomises Speed in the X Axis</span>
+        <span class="s1">self.rot = </span><span class="s3">0 </span><span class="s0">#Sets orginal rotation of the mob</span>
+        <span class="s1">self.rot_speed = random.randrange(-</span><span class="s3">8</span><span class="s2">, </span><span class="s3">8</span><span class="s1">) </span><span class="s0">#Sets the rotation speed in the function</span>
+        <span class="s1">self.last_update = pygame.time.get_ticks() </span><span class="s0">#Gets the time in milliseconds</span>
+
+    <span class="s0">#Function which rotates the mobs randomly</span>
+    <span class="s2">def </span><span class="s1">rotate(self):</span>
+        <span class="s1">now = pygame.time.get_ticks() </span><span class="s0">#Gets the time in milliseconds</span>
+        <span class="s2">if </span><span class="s1">now - self.last_update &gt; </span><span class="s3">50</span><span class="s1">: </span><span class="s0">#If an update hasnt happened in a certain number of milliseconds</span>
+            <span class="s1">self.last_update = now </span><span class="s0">#Sets the most recent updates time</span>
+            <span class="s1">self.rot = (self.rot + self.rot_speed) % </span><span class="s3">360 </span><span class="s0">#Uses the combined rotation speed and current rotation to rotate the mob randomly</span>
+            <span class="s1">self.image = pygame.transform.rotate(self.image_orig</span><span class="s2">, </span><span class="s1">self.rot) </span><span class="s0">#Rotates the sprite using the calcs</span>
+            <span class="s1">old_center = self.rect.center </span><span class="s0">#Sets the old center of the mob</span>
+            <span class="s1">self.rect = self.image.get_rect() </span><span class="s0">#Rotates the hitbox</span>
+            <span class="s1">self.rect.center = old_center </span><span class="s0">#Rotates to the correct orination</span>
+
+    <span class="s0">#Updates the position of the mob</span>
+    <span class="s2">def </span><span class="s1">update(self):</span>
+        <span class="s1">self.rotate() </span><span class="s0">#Calls for the rotatation of mob</span>
+        <span class="s1">self.rect.x += self.speedx </span><span class="s0">#Makes the hit box move with the sprite in xaxis</span>
+        <span class="s1">self.rect.y += self.speedy </span><span class="s0">#Makes the hit box move with the sprite in yaxis</span>
+        <span class="s2">if </span><span class="s1">self.rect.top &gt; height + </span><span class="s3">10 </span><span class="s2">or </span><span class="s1">self.rect.left &lt; -</span><span class="s3">25 </span><span class="s2">or </span><span class="s1">self.rect.right &gt; width + </span><span class="s3">20</span><span class="s1">: </span><span class="s0">#If the mob touches the border of the screen</span>
+            <span class="s1">self.rect.x = random.randrange(width - self.rect.width) </span><span class="s0">#Re sets mob on a diffrent randomised direction in xaxis</span>
+            <span class="s1">self.rect.y = random.randrange(-</span><span class="s3">100</span><span class="s2">, </span><span class="s1">-</span><span class="s3">40</span><span class="s1">) </span><span class="s0">#Resets the mob in a diffrent randomised direction in y axis</span>
+            <span class="s1">self.speedy = random.randrange(</span><span class="s3">1</span><span class="s2">, </span><span class="s3">8</span><span class="s1">) </span><span class="s0">#Randomises the speed in the y axis</span>
+
+<span class="s0">#Bullet Class that shoots from player sprite</span>
+<span class="s0"># .Rect is a pygame object for storing rectangular coordinates</span>
+<span class="s2">class </span><span class="s1">Bullet(pygame.sprite.Sprite):</span>
+    <span class="s2">def </span><span class="s1">__init__(self</span><span class="s2">, </span><span class="s1">x</span><span class="s2">, </span><span class="s1">y):</span>
+        <span class="s1">pygame.sprite.Sprite.__init__(self) </span><span class="s0">#Simple base class for visible game objects</span>
+        <span class="s1">self.image = bullet_img </span><span class="s0">#Sets the bullet to the image in the files</span>
+        <span class="s1">self.image.set_colorkey(BLACK) </span><span class="s0">#Sets the background colour as black and removes the background</span>
+        <span class="s1">self.rect = self.image.get_rect() </span><span class="s0">#Sets the rect to the size of the rectangle</span>
+        <span class="s1">self.rect.bottom = y</span>
+        <span class="s1">self.rect.centerx = x</span>
+        <span class="s1">self.speedy = -</span><span class="s3">10 </span><span class="s0">#Sets the speed of the bullet</span>
+
+    <span class="s0">#Movement of bullet</span>
+    <span class="s2">def </span><span class="s1">update(self):</span>
+        <span class="s1">self.rect.y += self.speedy</span>
+        <span class="s0"># kill if it moves off the top of the screen</span>
+        <span class="s2">if </span><span class="s1">self.rect.bottom &lt; </span><span class="s3">0</span><span class="s1">:</span>
+            <span class="s1">self.kill()</span>
+
+<span class="s2">def </span><span class="s1">draw_shield_bar(surf</span><span class="s2">, </span><span class="s1">x</span><span class="s2">, </span><span class="s1">y</span><span class="s2">, </span><span class="s1">pct):</span>
+    <span class="s2">if </span><span class="s1">pct &lt; </span><span class="s3">0</span><span class="s1">:</span>
+        <span class="s1">pct = </span><span class="s3">0</span>
+    <span class="s1">BAR_LENGTH = </span><span class="s3">100 </span><span class="s0">#Sets the bar length</span>
+    <span class="s1">BAR_HEIGHT = </span><span class="s3">10 </span><span class="s0">#Sets the bar Height</span>
+    <span class="s1">fill = (pct / </span><span class="s3">100</span><span class="s1">) * BAR_LENGTH </span><span class="s0">#Decides how much of the par to fill</span>
+    <span class="s1">outline_rect = pygame.Rect(x</span><span class="s2">, </span><span class="s1">y</span><span class="s2">, </span><span class="s1">BAR_LENGTH</span><span class="s2">, </span><span class="s1">BAR_HEIGHT) </span><span class="s0"># Creates a rectangle around the bar</span>
+    <span class="s1">fill_rect = pygame.Rect(x</span><span class="s2">, </span><span class="s1">y</span><span class="s2">, </span><span class="s1">fill</span><span class="s2">, </span><span class="s1">BAR_HEIGHT) </span><span class="s0">#Fills the rectangle</span>
+    <span class="s1">pygame.draw.rect(surf</span><span class="s2">, </span><span class="s1">GREEN</span><span class="s2">, </span><span class="s1">fill_rect) </span><span class="s0">#Makes the bar green</span>
+    <span class="s1">pygame.draw.rect(surf</span><span class="s2">, </span><span class="s1">WHITE</span><span class="s2">, </span><span class="s1">outline_rect</span><span class="s2">, </span><span class="s3">2</span><span class="s1">) </span><span class="s0">#Makes the rectangle white</span>
+
+<span class="s2">def </span><span class="s1">newmob():</span>
+    <span class="s1">m = Mob()</span>
+    <span class="s1">all_sprites.add(m)</span>
+    <span class="s1">mobs.add(m) </span><span class="s0">#Adds the mobs according to the max amount</span>
+
+<span class="s0">#Load all game graphics</span>
+<span class="s1">background = pygame.image.load(</span><span class="s4">'img/starfield.png'</span><span class="s1">).convert() </span><span class="s0">#Loads the image for background</span>
+<span class="s1">background_rect = background.get_rect() </span><span class="s0">#Makes the starfield the background</span>
+<span class="s1">player_img = pygame.image.load(</span><span class="s4">&quot;img/playerShip1_orange.png&quot;</span><span class="s1">).convert() </span><span class="s0">#Loads the image for the spaceship</span>
+<span class="s1">meteor_img = pygame.image.load(</span><span class="s4">&quot;img/meteorBrown_med1.png&quot;</span><span class="s1">).convert() </span><span class="s0">#Loads the image for the mob</span>
+<span class="s1">bullet_img = pygame.image.load(</span><span class="s4">&quot;img/laserRed16.png&quot;</span><span class="s1">).convert() </span><span class="s0">#Loads the image for the Laser</span>
+
+<span class="s0">#Loads Sounds</span>
+<span class="s1">shootsound = pygame.mixer.Sound(</span><span class="s4">'sound/pew.wav'</span><span class="s1">) </span><span class="s0">#Loads the sound for the lazer</span>
+<span class="s1">ExpSound = pygame.mixer.Sound(</span><span class="s4">'sound/expl3.wav'</span><span class="s1">) </span><span class="s0">#Loads the expolosion sound</span>
+<span class="s0">#Plays background music of either arctic monkeys or catfish and the bottle men 8bit versions</span>
+<span class="s1">randombackgroundmusic = random.randint(</span><span class="s3">1</span><span class="s2">,</span><span class="s3">2</span><span class="s1">)</span>
+<span class="s2">if </span><span class="s1">randombackgroundmusic == </span><span class="s3">1</span><span class="s1">:</span>
+    <span class="s1">pygame.mixer.music.load(</span><span class="s4">'sound/BackgroundMusic2.mp3'</span><span class="s1">) </span><span class="s0">#Loads arctic monkeys song</span>
+<span class="s2">elif </span><span class="s1">randombackgroundmusic == </span><span class="s3">2</span><span class="s1">:</span>
+    <span class="s1">pygame.mixer.music.load(</span><span class="s4">'sound/BackgroundMusic2 .mp3'</span><span class="s1">) </span><span class="s0">#loads Catfish and the bottlemen song</span>
+<span class="s1">pygame.mixer.music.set_volume(</span><span class="s3">0.4</span><span class="s1">) </span><span class="s0">#Sets the music volume</span>
+
+<span class="s0">#Creates a sprite group and adds a player sprite</span>
+<span class="s1">all_sprites = pygame.sprite.Group() </span><span class="s0">#Creates a sprite group</span>
+<span class="s1">mobs = pygame.sprite.Group() </span><span class="s0">#Adds mobs to the sprite group</span>
+<span class="s1">bullets = pygame.sprite.Group() </span><span class="s0">#Adds bullet to the sprite group</span>
+<span class="s1">player = Player() </span><span class="s0">#Changes Player() to player</span>
+<span class="s1">all_sprites.add(player) </span><span class="s0">#Adds Player to the sprite group</span>
+
+<span class="s1">score = </span><span class="s3">0</span>
+<span class="s1">pygame.mixer.music.play(loops= -</span><span class="s3">1</span><span class="s1">) </span><span class="s0">#Loops the music</span>
+
+<span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range(</span><span class="s3">8</span><span class="s1">):  </span><span class="s0"># Sets the limit for mobs on screen</span>
+    <span class="s1">newmob()</span>
+
+<span class="s0"># Game Loop</span>
+<span class="s1">running = </span><span class="s2">True</span>
+<span class="s2">while </span><span class="s1">running:</span>
+    <span class="s0">#How many times the screen refreshes per second</span>
+    <span class="s1">clock.tick(fps)</span>
+    <span class="s2">for </span><span class="s1">event </span><span class="s2">in </span><span class="s1">pygame.event.get():</span>
+        <span class="s0"># check for closing window</span>
+        <span class="s2">if </span><span class="s1">event.type == pygame.QUIT:</span>
+            <span class="s1">running = </span><span class="s2">False</span>
+        <span class="s2">elif </span><span class="s1">event.type == pygame.KEYDOWN: </span><span class="s0">#Triggered when a player presses a button</span>
+            <span class="s2">if </span><span class="s1">event.key == pygame.K_SPACE: </span><span class="s0">#Triggered when the SpaceBar is pressed</span>
+                <span class="s1">player.shoot() </span><span class="s0">#Calls the function to shoot</span>
+
+    <span class="s0"># Update</span>
+    <span class="s1">all_sprites.update() </span><span class="s0">#Calls the update method on contained Sprites</span>
+
+
+    <span class="s0"># check to see if a bullet hit a mob</span>
+    <span class="s1">hits = pygame.sprite.groupcollide(mobs</span><span class="s2">, </span><span class="s1">bullets</span><span class="s2">, True, True</span><span class="s1">)</span>
+    <span class="s2">for </span><span class="s1">hit </span><span class="s2">in </span><span class="s1">hits:</span>
+        <span class="s1">score += </span><span class="s3">50 </span><span class="s1">- hit.radius </span><span class="s0">#Calculates how many points are allocated per mob kill</span>
+        <span class="s1">ExpSound.play() </span><span class="s0">#Plays the explosion sound</span>
+        <span class="s1">newmob()</span><span class="s0">#Calls the function made to respawn the mob that has despawned</span>
+    <span class="s0">#Check to see if a mob hits the player</span>
+    <span class="s1">hits = pygame.sprite.spritecollide(player</span><span class="s2">, </span><span class="s1">mobs</span><span class="s2">, True, </span><span class="s1">pygame.sprite.collide_circle) </span><span class="s0">#Checks to see if their is a collision</span>
+    <span class="s2">for </span><span class="s1">hit </span><span class="s2">in </span><span class="s1">hits:</span>
+        <span class="s1">player.shield -= hit.radius * </span><span class="s3">2 </span><span class="s0">#The players Shield will be subtracted depending upon the radius</span>
+        <span class="s1">newmob() </span><span class="s0">#Calls the function made to respawn the mob that has despawned</span>
+        <span class="s2">if </span><span class="s1">player.shield &lt;= </span><span class="s3">0</span><span class="s1">: </span><span class="s0">#When players shield is less than or equal to 0</span>
+            <span class="s1">running = </span><span class="s2">False  </span><span class="s0">#The game will end</span>
+
+    <span class="s0"># Colouring the screen</span>
+    <span class="s1">screen.blit(background</span><span class="s2">, </span><span class="s1">background_rect)</span>
+    <span class="s1">all_sprites.draw(screen) </span><span class="s0"># Blit the Sprite images</span>
+    <span class="s1">draw_text(screen</span><span class="s2">, </span><span class="s1">str(score)</span><span class="s2">, </span><span class="s3">18</span><span class="s2">, </span><span class="s1">width / </span><span class="s3">2</span><span class="s2">, </span><span class="s3">10</span><span class="s1">) </span><span class="s0">#Puts the current Score on the screen</span>
+    <span class="s1">draw_shield_bar(screen</span><span class="s2">, </span><span class="s3">5</span><span class="s2">, </span><span class="s3">5</span><span class="s2">, </span><span class="s1">player.shield) </span><span class="s0">#Puts the current shield onto the screen</span>
+    <span class="s0">#Updates the screen</span>
+    <span class="s1">pygame.display.flip()</span></pre>
+</body>
+</html>
