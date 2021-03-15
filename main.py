@@ -57,9 +57,9 @@ class Player(pygame.sprite.Sprite):
         # Game Logic Player Movement
 
     def update(self):
-        if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:  # Unhide if hidden
-            self.hidden = False
-            self.rect.center = (width / 2, height - 10)
+        if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:  # Unhide if hidden after timer is complete
+            self.hidden = False  # UnHides the player sprite
+            self.rect.center = (width / 2, height - 30)  # Recenters the player sprite
         self.speedx = 0  # Sets the xaxis speed to zero
         # Detects when a key is pressed
         keystate = pygame.key.get_pressed()  # Triggers when any key is pressed
@@ -90,7 +90,8 @@ class Player(pygame.sprite.Sprite):
     def hide(self):  # To temporarily hide the player after shield <=0
         self.hidden = True  # Hides the player sprite
         self.hide_timer = pygame.time.get_ticks()  # Starts a timer to calculate how long the player has been hidden
-        self.rect.center = (width / 2, height + 200) #Takes the player sprite off the screen so i cant be hit by metors while dead
+        self.rect.center = (
+        width / 2, height + 200)  # Takes the player sprite off the screen so i cant be hit by metors while dead
 
 
 """Enemy Class For Sprite
@@ -121,7 +122,7 @@ class Mob(pygame.sprite.Sprite):
         if now - self.last_update > 50:  # If an update hasnt happened in a certain number of milliseconds
             self.last_update = now  # Sets the most recent updates time
             self.rot = (
-                                   self.rot + self.rot_speed) % 360  # Uses the combined rotation speed and current rotation to rotate the mob randomly
+                               self.rot + self.rot_speed) % 360  # Uses the combined rotation speed and current rotation to rotate the mob randomly
             self.image = pygame.transform.rotate(self.image_orig, self.rot)  # Rotates the sprite using the calcs
             old_center = self.rect.center  # Sets the old center of the mob
             self.rect = self.image.get_rect()  # Rotates the hitbox
@@ -196,6 +197,14 @@ def draw_shield_bar(surf, x, y, pct):
     pygame.draw.rect(surf, WHITE, outline_rect, 2)  # Makes the rectangle white
 
 
+def draw_lives(surf, x, y, lives, img):  # Draws an image of the ship at the top of the screen to display lives
+    for i in range(lives):  # Displays the amount of ships corresponding to the amount of lives the player has left
+        img_rect = img.get_rect() # Gets the image for the small spaceship
+        img_rect.x = x + 30 * i # Positions the small spaceships next to each other in a line X Axis
+        img_rect.y = y # Puts them all on the same Y Axis
+        surf.blit(img, img_rect) # Blits the surface refreshing the screen
+
+
 def newmob():
     m = Mob()
     all_sprites.add(m)
@@ -214,6 +223,7 @@ explosion_anim = {}  # Starts a list for explosions
 explosion_anim['lg'] = []  # List of Large explosions
 explosion_anim['sm'] = []  # List of small explosions
 explosion_anim['player'] = []
+
 for i in range(9):
     filename = 'img/regularExplosion0{}.png'.format(i)  # Sets the current exlosion file
     img = pygame.image.load(filename).convert()
@@ -302,7 +312,7 @@ while running:
             player.shield = 100  # Resets the players shield to 100
 
     # If Player Dies And Expolosion has finished playing
-    if not player.alive() and not death_explosion.alive():
+    if player.lives <= 0 and not death_explosion.alive():
         running = False  # Stops the game from running after explosion has finished
 
     # Colouring the screen
@@ -310,5 +320,6 @@ while running:
     all_sprites.draw(screen)  # Blit the Sprite images
     draw_text(screen, str(score), 18, width / 2, 10)  # Puts the current Score on the screen
     draw_shield_bar(screen, 5, 5, player.shield)  # Puts the current shield onto the screen
+    draw_lives(screen, width - 100, 5, player.lives, player_mini_img) #Adds the lives to the screen
     # Updates the screen
     pygame.display.flip()
